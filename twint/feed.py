@@ -77,6 +77,7 @@ def Json(response):
 def parse_tweets(config, response):
     logme.debug(__name__ + ':parse_tweets')
     response = loads(response)
+    # print(response)
     if len(response['globalObjects']['tweets']) == 0:
         msg = 'No more data!'
         raise NoMoreTweetsException(msg)

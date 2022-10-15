@@ -16,11 +16,13 @@ def _sanitizeQuery(_url, params):
 
 
 def _formatDate(date):
-    if "win" in platform:
-        return f'\"{date.split()[0]}\"'
+    # if "win" in platform:
+        # return f'\"{date.split()[0]}\"'
     try:
+        # print(f'{date} == {int(datetime.datetime.strptime(date, "%Y-%m-%d %H:%M:%S").timestamp())}')
         return int(datetime.datetime.strptime(date, "%Y-%m-%d %H:%M:%S").timestamp())
     except ValueError:
+        # print('ValueError in date.')
         return int(datetime.datetime.strptime(date, "%Y-%m-%d").timestamp())
 
 
@@ -68,6 +70,7 @@ async def Search(config, init):
     logme.debug(__name__ + ':Search')
     url = base
     tweet_count = 100
+    # tweet_count = 100 if not config.Limit else config.Limit
     q = ""
     params = [
         # ('include_blocking', '1'),
@@ -89,16 +92,19 @@ async def Search(config, init):
         ('send_error_codes', 'true'),
         ('simple_quoted_tweet', 'true'),
         ('count', tweet_count),
-        # ('query_source', 'typed_query'),
+        ('query_source', 'typed_query'),
         # ('pc', '1'),
         ('cursor', str(init)),
         ('spelling_corrections', '1'),
         ('ext', 'mediaStats%2ChighlightedLabel'),
         ('tweet_search_mode', 'live'),  # this can be handled better, maybe take an argument and set it then
     ]
+    # if typed_query:
+    #     q += f'source:{typed_query}'
     if not config.Popular_tweets:
         params.append(('f', 'tweets'))
     if config.Lang:
+        q += f" lang:{config.Lang}"
         params.append(("l", config.Lang))
         params.append(("lang", "en"))
     if config.Query:
@@ -109,13 +115,14 @@ async def Search(config, init):
         config.Geo = config.Geo.replace(" ", "")
         q += f" geocode:{config.Geo}"
     if config.Search:
-
         q += f" {config.Search}"
     if config.Year:
         q += f" until:{config.Year}-1-1"
     if config.Since:
+        # print(f'since:{_formatDate(config.Since)}')
         q += f" since:{_formatDate(config.Since)}"
     if config.Until:
+        # print(f"until:{_formatDate(config.Until)}")
         q += f" until:{_formatDate(config.Until)}"
     if config.Email:
         q += ' "mail" OR "email" OR'
@@ -160,6 +167,7 @@ async def Search(config, init):
     if config.Custom_query:
         q = config.Custom_query
 
+    # print(params)
     q = q.strip()
     params.append(("q", q))
     _serialQuery = _sanitizeQuery(url, params)

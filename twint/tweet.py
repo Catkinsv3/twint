@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 
 import logging as logme
 from googletransx import Translator
-# ref. 
+# ref.
 # - https://github.com/x0rzkov/py-googletrans#basic-usage
 translator = Translator()
 
@@ -69,6 +69,7 @@ def getText(tw):
     text = text.replace("http", " http")
     text = text.replace("pic.twitter", " pic.twitter")
     text = text.replace("\n", " ")
+    text = text.replace("\r", " ")
 
     return text
 
